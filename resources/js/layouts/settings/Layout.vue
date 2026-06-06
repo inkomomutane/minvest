@@ -9,6 +9,7 @@ import { edit as editAppearance } from '@/routes/appearance';
 import { edit as editProfile } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
 import type { NavItem } from '@/types';
+import { Card } from '@/components/ui/card';
 
 const sidebarNavItems: NavItem[] = [
     {
@@ -29,7 +30,7 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
 </script>
 
 <template>
-    <div class="px-4 py-6">
+    <Card class="px-4 py-6 bg-white dark:bg-zinc-950  mt-0 md:mt-12 rounded-none shadow-none">
         <Heading
             title="Settings"
             description="Manage your profile and account settings"
@@ -67,5 +68,5 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
                 </section>
             </div>
         </div>
-    </div>
+    </Card>
 </template>

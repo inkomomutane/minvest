@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-vue-next';
+import { BookOpen, Moon,Monitor,Sun, LayoutGrid, Menu, Search } from 'lucide-vue-next';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
@@ -37,6 +37,7 @@ import { getInitials } from '@/composables/useInitials';
 import { toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem, NavItem } from '@/types';
+import { useAppearance } from '@/composables/useAppearance';
 
 type Props = {
     breadcrumbs?: BreadcrumbItem[];
@@ -61,22 +62,17 @@ const mainNavItems: NavItem[] = [
     },
 ];
 
-const rightNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/vue-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#vue',
-        icon: BookOpen,
-    },
-];
+const { appearance, updateAppearance } = useAppearance();
+
+const tabs = [
+    { value: 'light', Icon: Sun, label: 'Light' },
+    { value: 'dark', Icon: Moon, label: 'Dark' },
+    { value: 'system', Icon: Monitor, label: 'System' }
+]as const;
 </script>
 
 <template>
-    <div>
+    <div class="border-sidebar-border/80 sticky top-0 z-50 border-b bg-white dark:border-zinc-800 dark:bg-zinc-950">
         <div class="border-b border-sidebar-border/80">
             <div class="mx-auto flex h-16 items-center px-4 md:max-w-7xl">
                 <!-- Mobile Menu -->
@@ -200,43 +196,25 @@ const rightNavItems: NavItem[] = [
                             />
                         </Button>
 
-                        <div class="hidden space-x-1 lg:flex">
-                            <template
-                                v-for="item in rightNavItems"
-                                :key="item.title"
+                    </div>
+                    <div class="relative flex items-center space-x-1">
+                        <div :class="['inline-flex gap-1 rounded-3xl bg-neutral-100 p-1 dark:bg-neutral-800', props.class]">
+                            <button
+                                v-for="{ value, Icon, label } in tabs"
+                                :key="value"
+                                @click="updateAppearance(value)"
+                                :class="[
+                                    'flex items-center rounded-full p-2 transition-colors',
+                                    appearance === value
+                                        ? 'bg-white shadow-xs dark:bg-neutral-700 dark:text-neutral-100'
+                                        : 'text-neutral-500 hover:bg-neutral-200/60 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-700/60',
+                                ]"
                             >
-                                <TooltipProvider :delay-duration="0">
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                as-child
-                                                class="group h-9 w-9 cursor-pointer"
-                                            >
-                                                <a
-                                                    :href="toUrl(item.href)"
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                >
-                                                    <span class="sr-only">{{
-                                                        item.title
-                                                    }}</span>
-                                                    <component
-                                                        :is="item.icon"
-                                                        class="size-5 opacity-80 group-hover:opacity-100"
-                                                    />
-                                                </a>
-                                            </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>{{ item.title }}</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                            </template>
+                                <component :is="Icon" class="h-4 w-4" />
+                            </button>
                         </div>
                     </div>
+
 
                     <DropdownMenu>
                         <DropdownMenuTrigger :as-child="true">
