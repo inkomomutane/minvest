@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('code')->nullable();
-            $table->jsonb('icon')->nullable();
+            $table->string('icon')->nullable();
+            $table->string('icon_type')->nullable();
             $table->timestamps();
         });
     }

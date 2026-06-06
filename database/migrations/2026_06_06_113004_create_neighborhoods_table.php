@@ -15,8 +15,7 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->string('name')->unique();
             $table->string('city_name');
-            $table->foreign('city_name')->references('name')->on('cities')
-                ->onDelete('cascade');
+            $table->foreign('city_name')->references('name')->on('cities')->onDelete('cascade');
             $table->timestamps();
         });
     }

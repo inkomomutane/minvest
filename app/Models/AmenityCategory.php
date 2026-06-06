@@ -2,17 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 
-class Attribute extends Model
+class AmenityCategory extends Model
 {
-    use HasUlids;
+    protected $table = 'amenity_categories';
 
     protected $fillable = [
         'name',
         'description',
-        'code',
         'icon',
         'icon_type',
     ];

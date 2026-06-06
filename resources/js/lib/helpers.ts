@@ -6,6 +6,7 @@ import {
 } from '@internationalized/date';
 
 import currency from 'currency.js';
+import ref from "vue"
 
 
 export const NUMBER = (
@@ -84,3 +85,24 @@ export const enumKeyOf = (enumObject: any, value: any) => {
 
     return response;
 };
+
+export function crudManager<T>() {
+    const isModalOpen = ref(false);
+    const model = ref<T | null>();
+    const open = (modelValue?: T) => {
+        isModalOpen.value = true;
+        model.value = modelValue;
+    };
+
+    const close = () => {
+        model.value = null;
+        isModalOpen.value = false;
+    };
+
+    return {
+        isModalOpen,
+        model,
+        open,
+        close,
+    };
+}

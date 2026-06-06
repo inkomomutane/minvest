@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('property_types', function (Blueprint $table) {
-            $table->id();
+        Schema::create('property_types', static function (Blueprint $table) {
+            $table->ulid('id')->primary();
+            $table->string('name');
+            $table->string('icon')->nullable();
+            $table->string('icon_type')->nullable();
             $table->timestamps();
         });
     }
