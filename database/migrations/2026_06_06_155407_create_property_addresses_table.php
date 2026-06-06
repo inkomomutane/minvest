@@ -21,7 +21,16 @@ return new class extends Migration
             $table->string('country');
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
+
+            $table->longText('directions')->nullable();
+
+            $table->longText('google_maps_embed_code')->nullable();
+            $table->longText('google_map_link')->nullable();
+            $table->longText('google_maps_place_id')->nullable();
+
             $table->timestamps();
+            $table->foreign('property_id')->references('id')->on('properties')->cascadeOnDelete();
+
         });
     }
 

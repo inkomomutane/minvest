@@ -13,7 +13,7 @@ return new class extends Migration
     {
 
         Schema::create('property_rule_categories', static function (Blueprint $table) {
-             $table->string('name')->primary();
+             $table->string('name')->primary()->comment('e.g., "house rules", "health and safety", "cancellation policy"');
              $table->text('description')->nullable();
              $table->string('icon')->nullable();
              $table->string('icon_type')->nullable();

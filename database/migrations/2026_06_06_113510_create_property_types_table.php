@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('property_types', static function (Blueprint $table) {
             $table->ulid('id')->primary();
-            $table->string('name');
+            $table->string('name')->unique();
             $table->string('icon')->nullable();
             $table->string('icon_type')->nullable();
             $table->timestamps();
