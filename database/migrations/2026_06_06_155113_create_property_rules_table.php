@@ -16,24 +16,25 @@ return new class extends Migration
              $table->string('name')->primary()->comment('e.g., "house rules", "health and safety", "cancellation policy"');
              $table->text('description')->nullable();
              $table->string('icon')->nullable();
-             $table->string('icon_type')->nullable();
+             $table->foreign('icon')->references('name')->on('icons')->nullOnDelete();
         });
 
 
         Schema::create('property_rules', static function (Blueprint $table) {
             $table->ulid('id')->primary();
-            $table->string('property_id');
+            $table->string('property_id')->nullable();
             $table->string('category')->nullable();
             $table->string('name')->nullable();
             $table->longText('content');
 
             $table->string('icon')->nullable();
-            $table->string('icon_type')->nullable();
 
             $table->timestamps();
 
             $table->foreign('property_id')->references('id')->on('properties')->nullOnDelete();
             $table->foreign('category')->references('name')->on('property_rule_categories')->nullOnDelete();
+
+            $table->foreign('icon')->references('name')->on('icons')->nullOnDelete();
         });
     }
 

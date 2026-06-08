@@ -17,8 +17,9 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('code')->nullable();
             $table->string('icon')->nullable();
-            $table->string('icon_type')->nullable();
             $table->timestamps();
+
+            $table->foreign('icon')->references('name')->on('icons')->nullOnDelete();
         });
     }
 

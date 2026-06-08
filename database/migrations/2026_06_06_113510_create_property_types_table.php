@@ -15,8 +15,8 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->string('name')->unique();
             $table->string('icon')->nullable();
-            $table->string('icon_type')->nullable();
             $table->timestamps();
+            $table->foreign('icon')->references('name')->on('icons')->nullOnDelete();
         });
     }
 

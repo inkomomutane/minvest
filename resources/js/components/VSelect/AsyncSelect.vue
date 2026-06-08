@@ -14,57 +14,64 @@ import { ListboxItem } from 'reka-ui';
 import { ulid } from 'ulidx';
 import { PropType, computed, onMounted, ref, watch } from 'vue';
 
-
 const props = defineProps({
-  placeholder: {
-    type: String,
-    default: t('Select'),
-  },
-  routeName: {
-    type: Object as PropType<any>,
-    required: true,
-  },
-  reduce: {
-    type: Function,
-    default: (option: any) => option,
-  },
-  getLabel: {
-    type: Function,
-    default: (option: any) => option,
-  },
-  class: {
-    default: '',
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
+    placeholder: {
+        type: String,
+        default: t('Select'),
+    },
+    /**
+     * The generated Wayfinder route function or route builder object.
+     * e.g., :route-method="index"
+     */
+    routeMethod: {
+        type: [Function, Object] as PropType<any>,
+        required: true,
+    },
+    reduce: {
+        type: Function,
+        default: (option: any) => option,
+    },
+    getLabel: {
+        type: Function,
+        default: (option: any) => option,
+    },
+    class: {
+        default: '',
+    },
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
     align: {
-      type: String,
+        type: String,
         default: 'start'
     },
-  mapper: {
-    type: Function as PropType<(item: T) => SelectOptionType>,
-    default: (item: T): SelectOptionType => ({
-      id: item.id,
-      title: item.title,
-      subtitle: item.subtitle || '',
-      slug: item.slug || '',
-      notes: item.notes || '',
-      trailer: item.trailer,
-    }),
-  },
-  selectedKey: {
-    type: String,
-    default: 'id',
-  },
-  createNew: {
-    type: Function,
-    required: false,
-    default: () => {
-      console.warn('Create new function not provided');
+    mapper: {
+        type: Function as PropType<(item: T) => SelectOptionType>,
+        default: (item: T): SelectOptionType => ({
+            id: item.id,
+            title: item.title,
+            subtitle: item.subtitle || '',
+            slug: item.slug || '',
+            notes: item.notes || '',
+            trailer: item.trailer,
+        }),
     },
-  },
+    selectedKey: {
+        type: String,
+        default: 'id',
+    },
+    createNew: {
+        type: Function,
+        required: false,
+        default: () => {
+            console.warn('Create new function not provided');
+        },
+    },
+    canCreate: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const emit = defineEmits(['value:selected', 'value:deselected']);
@@ -74,194 +81,215 @@ const searchQuery = ref('');
 const options = ref<T[]>([]);
 const loading = ref(false);
 const abortController = ref<AbortController | null>(null);
+const model = defineModel();
 
 const fetchCounties = async (search: string = ''): Promise<{ data: T[] }> => {
-  if (abortController.value) {
-    abortController.value.abort();
-  }
-  abortController.value = new AbortController();
-  const signal = abortController.value.signal;
-
-  // const url = route(props.routeName, {
-  //   search: search,
-  //   selected_key: props.selectedKey,
-  //   selected_value: model.value,
-  // });
-
-    const url = '';
-
-  try {
-    const response = await fetch(url, { signal: signal });
-
-    if (!response.ok) {
-      console.error(`HTTP error! status: ${response.status}`);
+    if (abortController.value) {
+        abortController.value.abort();
     }
-    const data = await response.json();
+    abortController.value = new AbortController();
+    const signal = abortController.value.signal;
 
-    return {
-      data: data,
+    // Query payload configuration configuration
+    const optionsPayload = {
+        query: {
+            search: search,
+            selected_key: props.selectedKey,
+            selected_value: model.value,
+        }
     };
-  } catch (error: any) {
-    if (error.name === 'AbortError') {
-      console.log('Fetch aborted');
-      // Return empty data on abort
+
+    let requestConfig;
+
+    // Wayfinder routes allow you to chain `.parameters()` to inject default or route-bound parameters fluently,
+    // falling back to direct method execution if it's passed as a plain execution function.
+    if (typeof props.routeMethod.parameters === 'function') {
+        requestConfig = props.routeMethod.parameters().call(null, optionsPayload);
+    } else if (typeof props.routeMethod === 'function') {
+        requestConfig = props.routeMethod(optionsPayload);
     } else {
-      console.error('Fetch error:', error);
-      throw error; // Re-throw other errors
+        // If an evaluation object with an internal URL is passed
+        requestConfig = props.routeMethod;
     }
-    return { data: [] };
-  } finally {
-    abortController.value = null;
-  }
+
+    const url = requestConfig?.url || '';
+
+    try {
+        const response = await fetch(url, {
+            method: requestConfig?.method || 'GET',
+            signal: signal
+        });
+
+        if (!response.ok) {
+            console.error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        return {
+            data: data,
+        };
+    } catch (error: any) {
+        if (error.name === 'AbortError') {
+            console.log('Fetch aborted');
+        } else {
+            console.error('Fetch error:', error);
+            throw error;
+        }
+        return { data: [] };
+    } finally {
+        abortController.value = null;
+    }
 };
+
 const loadCounties = async () => {
-  loading.value = true;
-  try {
-    const { data } = await fetchCounties(searchQuery.value);
-    options.value = data.map((item) => ({
-      ...item,
-      _uniqueKey: item.id || ulid().toString().toLowerCase(),
-    }));
-  } catch (error) {
-    console.error('Error loading options:', error);
-  } finally {
-    loading.value = false;
-  }
+    loading.value = true;
+    try {
+        const { data } = await fetchCounties(searchQuery.value);
+        options.value = data.map((item: any) => ({
+            ...item,
+            _uniqueKey: item.id || ulid().toString().toLowerCase(),
+        }));
+    } catch (error) {
+        console.error('Error loading options:', error);
+    } finally {
+        loading.value = false;
+    }
 };
 
 const debouncedSearch = useDebounceFn(() => {
-  loadCounties();
+    loadCounties();
 }, 300);
 
 watch(searchQuery, () => {
-  debouncedSearch();
+    debouncedSearch();
 });
 
 onMounted(() => {
-  loadCounties();
+    loadCounties();
 });
 
-const model = defineModel();
-
 const selectedValue = computed(() => {
-  return options.value.find((option) => props.reduce(option) === model.value) ?? null;
+    return options.value.find((option) => props.reduce(option) === model.value) ?? null;
 });
 
 watch(
-  selectedValue,
-  (e) => {
-    if (e) {
-      emit('value:selected', e);
-    }
-  },
-  {
-    deep: true,
-    immediate: true,
-  },
+    selectedValue,
+    (e) => {
+        if (e) {
+            emit('value:selected', e);
+        }
+    },
+    {
+        deep: true,
+        immediate: true,
+    },
 );
 
 const handleSelect = (item: T) => {
-
     if (selectedValue.value && props.reduce(item) === props.reduce(selectedValue.value)) {
         model.value = null;
         emit('value:deselected', item);
         return;
     }
 
-  open.value = false;
-  searchQuery.value = '';
-  model.value = props.reduce(item) ;
+    open.value = false;
+    searchQuery.value = '';
+    model.value = props.reduce(item) ;
 };
 
 watch(open, (isOpen) => {
-  if (isOpen) {
-    searchQuery.value = '';
-    loadCounties();
-  }
+    if (isOpen) {
+        searchQuery.value = '';
+        loadCounties();
+    }
 });
 
 watch(() => model.value, () => {
     if (!selectedValue.value) {
-        loadCounties()
+        loadCounties();
     }
 });
-
-
 </script>
 
 <template>
-  <Popover v-model:open="open">
-      <div class="flex flex-row">
-          <PopoverTrigger as-child>
-              <slot name="trigger">
-                  <Button
-                      id="select-42"
-                      variant="outline"
-                      role="combobox"
-                      :disabled="disabled"
-                      :aria-expanded="open"
-                      class="w-full min-w-40 justify-between bg-background px-3 font-normal hover:bg-background cursor-pointer"
-                  >
-                    <span :class="cn('truncate')">
-                      {{ selectedValue ? getLabel(selectedValue) : placeholder }}
-                    </span>
-                      <ChevronDown :size="16" :stroke-width="2" class="shrink-0 text-muted-foreground/80" aria-hidden="true" />
-                  </Button>
-              </slot>
-          </PopoverTrigger>
-      </div>
+    <Popover v-model:open="open">
+        <div class="flex flex-row">
+            <PopoverTrigger as-child>
+                <slot name="trigger">
+                    <Button
+                        id="select-42"
+                        variant="outline"
+                        role="combobox"
+                        :disabled="disabled"
+                        :aria-expanded="open"
+                        class="w-full min-w-40 justify-between bg-background px-3 font-normal hover:bg-background cursor-pointer"
+                    >
 
-    <PopoverContent class="w-full min-w-[var(--reka-popper-anchor-width)] p-0" :align="align">
-      <Command class="w-full">
-        <CommandInput :placeholder="placeholder" v-model="searchQuery" />
-        <CommandGroup>
-          <Button variant="ghost" class="w-full cursor-pointer justify-start rounded-xs font-normal" @click="createNew">
-            <Plus :size="16" :stroke-width="2" class="me-2 opacity-60" aria-hidden="true" />
-            {{ t('Add new') }}
-          </Button>
-        </CommandGroup>
-        <CommandSeparator />
-        <CommandList>
-          <CommandEmpty v-if="!loading && options.length === 0">
-            {{ t('No items found.') }}
-          </CommandEmpty>
-          <ListboxItem
-            v-for="option in options"
-            :key="option._uniqueKey"
-            :class="
-              cn(
-                `relative flex cursor-default items-center gap-2 rounded-sm text-sm outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground`,
-                props.class,
-              )
+                        <slot name="label" :label="selectedValue">
+                             <span :class="cn('truncate')">
+                              {{ selectedValue ? getLabel(selectedValue) : placeholder }}
+                            </span>
+                        </slot>
+
+                        <ChevronDown :size="16" :stroke-width="2" class="shrink-0 text-muted-foreground/80" aria-hidden="true" />
+                    </Button>
+                </slot>
+            </PopoverTrigger>
+        </div>
+
+        <PopoverContent class="w-full min-w-[var(--reka-popper-anchor-width)] p-0" :align="align">
+            <Command class="w-full">
+                <CommandInput :placeholder="placeholder" v-model="searchQuery" />
+                <CommandGroup  v-if="props.canCreate">
+                    <Button
+                        variant="ghost" class="w-full cursor-pointer justify-start rounded-xs font-normal" @click="createNew">
+                        <Plus :size="16" :stroke-width="2" class="me-2 opacity-60" aria-hidden="true" />
+                        {{ t('Add new') }}
+                    </Button>
+                </CommandGroup>
+                <CommandSeparator />
+                <CommandList>
+                    <CommandEmpty v-if="!loading && options.length === 0">
+                        {{ t('No items found.') }}
+                    </CommandEmpty>
+                    <ListboxItem
+                        v-for="option in options"
+                        :key="option._uniqueKey"
+                        :class="
+                          cn(
+                            `relative flex cursor-default items-center gap-2 rounded-sm text-sm outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground`,
+                            props.class,
+                          )
             "
-            @select="handleSelect(option)"
-          >
-            <SelectOption :option="props.mapper(option)" :selected="selectedValue === option" >
-                <template v-slot:trailer="{ option }">
-                    <slot name="trailer" :option="option"/>
-                </template>
-            </SelectOption>
-          </ListboxItem>
-          <Separator />
-          <div v-if="loading" class="gapy-4 flex w-full flex-col items-start space-x-4 p-4">
-            <div class="w-full space-y-2">
-              <div class="flex flex-row justify-between">
-                <Skeleton class="h-2 w-[25px]" />
-                <Skeleton class="h-2 w-[25px]" />
-              </div>
-              <Skeleton class="h-2 w-[250px]" />
-              <Skeleton class="h-2 w-[200px]" />
-              <Skeleton class="h-1.5 w-[20px]" />
-            </div>
-          </div>
-          <!-- End of results indicator -->
-          <div v-if="options.length > 0 && !loading" class="flex items-center justify-center p-2">
+                        @select="handleSelect(option)"
+                    >
+
+                        <SelectOption :option="props.mapper(option)" :selected="selectedValue === option" >
+                            <template v-slot:trailer="{ option }">
+                                <slot name="trailer" :option="option"/>
+                            </template>
+                        </SelectOption>
+                    </ListboxItem>
+
+                    <Separator />
+                    <div v-if="loading" class="gapy-4 flex w-full flex-col items-start space-x-4 p-4">
+                        <div class="w-full space-y-2">
+                            <div class="flex flex-row justify-between">
+                                <Skeleton class="h-2 w-[25px]" />
+                                <Skeleton class="h-2 w-[25px]" />
+                            </div>
+                            <Skeleton class="h-2 w-[250px]" />
+                            <Skeleton class="h-2 w-[200px]" />
+                            <Skeleton class="h-1.5 w-[20px]" />
+                        </div>
+                    </div>
+                    <div v-if="options.length > 0 && !loading" class="flex items-center justify-center p-2">
             <span class="text-xs text-muted-foreground">
               {{ t('No more items found.') }}
             </span>
-          </div>
-        </CommandList>
-      </Command>
-    </PopoverContent>
-  </Popover>
+                    </div>
+                </CommandList>
+            </Command>
+        </PopoverContent>
+    </Popover>
 </template>

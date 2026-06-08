@@ -10,6 +10,8 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "afatmustafa/blade-hugeicons": "^2.0",
+        "blade-ui-kit/blade-icons": "^1.10",
         "inertiajs/inertia-laravel": "^3.0",
         "laravel-lang/common": "^6.8",
         "laravel/chisel": "^0.1.0",
@@ -17,6 +19,7 @@
         "laravel/framework": "^13.7",
         "laravel/tinker": "^3.0",
         "laravel/wayfinder": "^0.1.14",
+        "mallardduck/blade-lucide-icons": "^1.26",
         "spatie/laravel-data": "^4.23",
         "spatie/laravel-enum": "^3.3",
         "spatie/laravel-medialibrary": "^11.23",

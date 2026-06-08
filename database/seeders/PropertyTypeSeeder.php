@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\PropertyType;
 use Illuminate\Database\Seeder;
 
 class PropertyTypeSeeder extends Seeder
@@ -12,6 +12,28 @@ class PropertyTypeSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+
+        $amenities = [
+            'Common',
+            'Pool',
+            'Gym',
+            'Parking',
+            'Patio',
+            'Balcony',
+            'Living room',
+            'Dining room',
+            'Kitchen',
+            'Bedroom',
+            'Bathroom',
+            'Garage',
+            'Laundry room',
+        ];
+        foreach ($amenities as $amenity) {
+            PropertyType::updateOrCreate([
+                'name' => $amenity,
+            ], [
+                'name' => $amenity,
+            ]);
+        }
     }
 }
