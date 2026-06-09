@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { t } from '@/lib/utils';
+import { t } from '@/lib/trans';
 import { cn } from '@/lib/utils';
 import {  ChevronsUpDown } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';

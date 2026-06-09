@@ -6,7 +6,7 @@ import {
 } from '@internationalized/date';
 
 import currency from 'currency.js';
-import ref from "vue"
+import { ref } from 'vue';
 
 
 export const NUMBER = (

@@ -9,9 +9,8 @@ class PropertyType extends Model
 {
     use HasUlids;
 
-    protected $fillable  = [
+    protected $fillable = [
         'name',
         'icon',
-        'icon_type',
     ];
 }

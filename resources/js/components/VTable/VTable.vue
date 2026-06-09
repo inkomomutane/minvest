@@ -1,8 +1,8 @@
 <script setup lang="ts" generic="T">
 import type { ColumnTableConfig } from './ColumnTableRef';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { t } from '@/lib/utils';
-import { cn, valueUpdater } from '@/lib/utils';
+import { t } from '@/lib/trans';
+import { cn } from '@/lib/utils';
 import { ChevronDown, Cog } from 'lucide-vue-next';
 import {
     ColumnFiltersState,
@@ -20,6 +20,7 @@ import {
 import { ref,onMounted,h } from 'vue';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { valueUpdater } from '@/components/ui/table/utils';
 
 interface Props {
     columnsDefs: Array<ColumnTableConfig<T>>;

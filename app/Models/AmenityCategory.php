@@ -12,6 +12,5 @@ class AmenityCategory extends Model
         'name',
         'description',
         'icon',
-        'icon_type',
     ];
 }

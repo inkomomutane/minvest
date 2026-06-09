@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
+import { Head, usePage } from '@inertiajs/vue3';
 import PlaceholderPattern from '@/components/PlaceholderPattern.vue';
-import { dashboard, iconSearch } from '@/routes';
+import { dashboard, iconSearch,ListUsers } from '@/routes';
 import AsyncSelect from '@/components/VSelect/AsyncSelect.vue';
 import { Item, ItemContent, ItemMedia, ItemTitle } from '@/components/ui/item';
 import { Avatar } from '@/components/ui/avatar';
 import { ref } from 'vue';
+import LinkTab from '@/components/LinkTab.vue';
+
 
 
 defineProps({
@@ -13,6 +15,7 @@ defineProps({
 });
 
 const modeV= ref();
+const page = usePage();
 
 defineOptions({
     layout: {
@@ -32,6 +35,19 @@ defineOptions({
     <div
         class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
     >
+
+         <LinkTab :tabs="[
+             {
+                    title: 'Dashboard',
+                    url: dashboard(),
+                    isActive: page.url === dashboard().url
+             },
+              {
+                    title: 'Users',
+                    url: ListUsers(),
+                    isActive: page.url === ListUsers().url
+             },
+         ]"/>
         <div class="grid auto-rows-min gap-4 md:grid-cols-3">
             <AsyncSelect
                 v-model="modeV"

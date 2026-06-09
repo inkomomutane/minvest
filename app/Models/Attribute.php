@@ -14,6 +14,5 @@ class Attribute extends Model
         'description',
         'code',
         'icon',
-        'icon_type',
     ];
 }

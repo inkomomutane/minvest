@@ -6,14 +6,15 @@ use App\Concerns\HasEnumToString;
 use App\Concerns\HasToObjects;
 use App\Concerns\HasToValues;
 
-enum Sex : string
+enum UserRole : string
 {
 
     use HasEnumToString;
     use HasToObjects;
     use HasToValues;
 
-    case Male  = 'male';
-    case Female = 'female';
-    case Other = 'other';
+    case SuperAdmin = 'super-admin';
+    case Admin = 'admin';
+    case Manager = 'manager';
+    case Guest = 'guest';
 }

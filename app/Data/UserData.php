@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Data;
 
 use App\Models\User;
@@ -12,19 +13,16 @@ class UserData extends Data
         public ?string $id,
         public ?string $name,
         public ?string $email,
-        public ?string $role,
+        public ?array $role = [],
     ) {}
-
-
-
 
     public static function fromModel(User $user): self
     {
         return new self(
-             id: $user->id,
-             name: $user->name,
-             email: $user->email,
-             role: $user->roles?->first()->name
+            id: $user->id,
+            name: $user->name,
+            email: $user->email,
+            role: $user->roles?->pluck('name')?->toArray(),
         );
     }
 }

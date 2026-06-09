@@ -16,7 +16,6 @@ class Amenity extends Model
         'description',
         'category',
         'icon',
-        'icon_type',
     ];
 
     public function categoryRelation(): BelongsTo

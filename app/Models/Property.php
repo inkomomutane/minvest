@@ -35,11 +35,10 @@ class Property extends Model
         'vehicle_fee',
     ];
 
-
     protected function casts(): array
     {
         return [
-            'status' => PropertyStatus::class
+            'status' => PropertyStatus::class,
         ];
     }
 
@@ -48,9 +47,8 @@ class Property extends Model
         return $this->hasMany(Rating::class, 'property_id');
     }
 
-
-    public function getAttributeRatingAvg() {
+    public function getAttributeRatingAvg()
+    {
         return $this->ratings()->avg('ratings');
     }
-
 }

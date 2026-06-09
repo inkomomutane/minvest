@@ -20,5 +20,9 @@ class PropertyAddress extends Model
         'country',
         'latitude',
         'longitude',
+        'directions',
+        'google_maps_embed_code',
+        'google_map_link',
+        'google_maps_place_id',
     ];
 }

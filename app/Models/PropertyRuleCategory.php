@@ -10,6 +10,5 @@ class PropertyRuleCategory extends Model
         'name',
         'description',
         'icon',
-        'icon_type',
     ];
 }

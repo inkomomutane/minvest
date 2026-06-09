@@ -18,7 +18,6 @@ class PropertyRule extends Model
         'name',
         'content',
         'icon',
-        'icon_type',
     ];
 
     public function property(): BelongsTo

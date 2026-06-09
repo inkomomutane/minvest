@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PropertyTypeSeeder::class,
             IconSeeder::class,
+            RoleSeeder::class,
         ]);
     }
 }

@@ -14,7 +14,7 @@ import { nextTick, onMounted, ref, useTemplateRef, watch } from 'vue';
 import axios from 'axios';
 import { useSortable } from '@vueuse/integrations/useSortable';
 import { Checkbox } from '@/components/ui/checkbox';
-import { t } from '@/lib/utils';
+import { t } from '@/lib/trans';
 
 interface Props {
     table: any;
